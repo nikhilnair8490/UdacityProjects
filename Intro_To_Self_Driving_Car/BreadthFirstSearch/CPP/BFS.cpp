@@ -1,16 +1,20 @@
 #include <iostream>
-#include <deque>
-#include <vector>
-#include <set>
-#include <map>
+#include <deque>  // For frontier
+#include <vector> // For maze
+#include <set>    // For visited nodes
+#include <map>    // Mapping each node to their shortest path
 
 using std::deque;
+using std::map;
 using std::set;
 using std::vector;
-using std::map;
 
+// Returns all the neighbors of the given node within the boundary
 vector<vector<int>> find_neighbors(vector<int> &node, int nRows, int nCols);
-void printPath(map< vector<int>, vector<vector<int>> > &path, vector<int> &pathKey);
+// Prints the path associated with the pathKey
+void printPath(map<vector<int>, vector<vector<int>>> &path, vector<int> &pathKey);
+// Iterate over vector of vectors and for each of the
+// nested vector print its contents
 template <typename T>
 void print_2d_vector(const vector<vector<T>> &matrix);
 
@@ -21,48 +25,58 @@ int main()
         {'.', '.', '.', '#', '#'},
         {'#', '.', '#', '#', '.'},
         {'#', '.', '.', 'S', '.'}};
-    deque< vector<vector<int>> > frontier;
+    deque<vector<vector<int>>> frontier;
     set<vector<int>> visited;
     vector<vector<int>> neighbors;
     vector<vector<int>> startNode, currNode, tempVect;
-    map< vector<int>, vector<vector<int>> > path;
+    // key -> node coordinate, value-> shortest path from start to this node
+    // The path includes all the node coordinates as vector of vector
+    map<vector<int>, vector<vector<int>>> path;
 
-
+    // Find the start point and assign coordinates, distance and path to the start node
     for (int i = 0; i < maze.size(); ++i)
     {
         for (int j = 0; j < maze[i].size(); ++j)
         {
             if (maze[i][j] == 'S')
             {
-                path[{i,j}] = {{i,j}};
-                startNode = {{i,j}, {0}};
+                path[{i, j}] = {{i, j}};
+                startNode = {{i, j}, {0}};
             }
         }
     }
 
+    // Add start node to frontier
     frontier.push_back(startNode);
 
     bool exitFound = false;
-    vector< vector<int>> temp;
+
+    // Loop through the frontier
+    // extract the first node from frontier and find its neighbors
     while (!frontier.empty())
     {
         currNode = frontier.front();
-        frontier.pop_front();
+        frontier.pop_front(); // delete the front node from frontier
 
+        // End the search of the current extracted node is exit('E') and print result
         if (maze[currNode[0][0]][currNode[0][1]] == 'E')
         {
             exitFound = true;
             std::cout << "Exit Found!" << std::endl;
-            std::cout << " Coordinates are: "
+            std::cout << "Coordinates are: "
                       << "{" << currNode[0][0] << ","
                       << " " << currNode[0][1] << "}" << std::endl;
             std::cout << "Shortest distance to exit is: " << currNode[1][0] << std::endl;
-            std::cout << "The shortest path (start -> exit) is: "<< std::endl;
+            std::cout << "The shortest path (start -> exit) is: " << std::endl;
             printPath(path, currNode[0]);
         }
 
         neighbors = find_neighbors(currNode[0], maze.size() - 1, maze[0].size() - 1);
 
+        // Iterate through all nodes in the neighbor
+        // If the neighbor is not a wall ('#') or already visited then add it in frontier
+        // Calculate the path to each neighbor node from its parent
+        // Note: The parent node will already contain the path from start ('S')
         for (auto &node : neighbors)
         {
             char nodeVal = maze[node[0]][node[1]];
@@ -73,10 +87,11 @@ int main()
             else
             {
                 tempVect = {{node[0], node[1]}};
-                for (auto& node: path[currNode[0]]){
+                for (auto &node : path[currNode[0]])
+                {
                     tempVect.push_back(node);
                 }
-                
+
                 path[{node[0], node[1]}] = tempVect;
 
                 frontier.push_back({{node[0], node[1]}, {currNode[1][0] + 1}});
@@ -114,10 +129,8 @@ vector<vector<int>> find_neighbors(vector<int> &node, int nRows, int nCols)
     return neighbors;
 }
 
-/*
-Iterate over vector of vectors and for each of the
-nested vector print its contents
-*/
+// Iterate over vector of vectors and for each of the
+// nested vector print its contents
 template <typename T>
 void print_2d_vector(const vector<vector<T>> &matrix)
 {
@@ -132,12 +145,15 @@ void print_2d_vector(const vector<vector<T>> &matrix)
     std::cout << std::endl;
 }
 
-void printPath(map< vector<int>, vector<vector<int>> > &path, vector<int> &pathKey){
-    vector< vector<int>> outPath;
+void printPath(map<vector<int>, vector<vector<int>>> &path, vector<int> &pathKey)
+{
+    vector<vector<int>> outPath;
     outPath = path[pathKey];
 
-    for( auto &node: outPath){
-        std::cout<< "{" << node[0] << ", " << node[1] << "}" << " <- ";
+    for (auto &node : outPath)
+    {
+        std::cout << "{" << node[0] << ", " << node[1] << "}"
+                  << " <- ";
     }
-    std::cout<<std::endl;
+    std::cout << std::endl;
 }
