@@ -1,4 +1,5 @@
-src/.vscode/
+src/.vscode/on
 .vscode/
 build/
 log/
+*.code-workspace
