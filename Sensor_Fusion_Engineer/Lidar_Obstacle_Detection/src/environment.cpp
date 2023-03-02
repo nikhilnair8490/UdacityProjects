@@ -60,9 +60,11 @@ void simpleHighway(pcl::visualization::PCLVisualizer::Ptr &viewer)
         renderPointCloud(viewer,pointCloud,"pointCloud");
     }
 
-    // Create point processor
+    // Instantiate point processor object
+    ProcessPointClouds<pcl::PointXYZ>* processPointClouds = new ProcessPointClouds<pcl::PointXYZ>();
 
     delete lidar;
+    delete processPointClouds;
 }
 
 // setAngle: SWITCH CAMERA ANGLE {XY, TopDown, Side, FPS}
