@@ -53,8 +53,28 @@ std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT
 {
     // Time segmentation process
     auto startTime = std::chrono::steady_clock::now();
-	pcl::PointIndices::Ptr inliers;
-    // TODO:: Fill in this function to find inliers for the cloud.
+	pcl::PointIndices::Ptr inliers{new pcl::PointIndices};
+
+    // Function to find inliers for the cloud. Inliers are  part of the segment plane (e.g road)
+    pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
+    // Create the segmentation object
+    pcl::SACSegmentation<PointT> seg;
+    // Optional
+    seg.setOptimizeCoefficients (true);
+    // Mandatory
+    seg.setModelType (pcl::SACMODEL_PLANE); // Data model for thr Sample Consensus algorithm
+    seg.setMethodType (pcl::SAC_RANSAC); // Random Sample Consensus algorithm
+    seg.setDistanceThreshold (distanceThreshold); // Determines how close a point must be to the model in order to be considered an inlier
+    seg.setMaxIterations(maxIterations); // Maximum number of iterations for the Consensus 
+
+    //Segment the largest planar component from the input cloud
+    seg.setInputCloud (cloud);
+    seg.segment (*inliers, *coefficients);
+
+    if (inliers->indices.size () == 0)
+    {
+        std::cout << "Could not estimate a planar model for the given dataset.\n" << std::endl;
+    }
 
     auto endTime = std::chrono::steady_clock::now();
     auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
