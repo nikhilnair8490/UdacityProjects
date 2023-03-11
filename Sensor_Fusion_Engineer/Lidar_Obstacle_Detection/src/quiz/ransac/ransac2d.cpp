@@ -69,6 +69,10 @@ pcl::visualization::PCLVisualizer::Ptr initScene()
  */
 std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int maxIterations, float distanceTol)
 {
+	
+	// Time segmentation process
+    auto startTime = std::chrono::steady_clock::now();
+
 	std::unordered_set<int> inliersResult;
 	std::unordered_set<int> inliersResultTemp;
 	srand(time(NULL));
@@ -104,7 +108,7 @@ std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int ma
 			y = cloud->points[j].y;
 
 			// Shortest distance between the line Ax+ By + C = 0 and the point
-			num = abs(A * x + B * y + C);
+			num = fabs(A * x + B * y + C);
 			den = sqrt(A * A + B * B);
 			d = num / den;
 
@@ -126,6 +130,10 @@ std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int ma
 		inliersResultTemp.clear();
 	}
 
+    auto endTime = std::chrono::steady_clock::now();
+    auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
+    std::cout << "quiz/RANSAC took " << elapsedTime.count() << " milliseconds" << std::endl;
+
 	return inliersResult;
 }
 
@@ -139,7 +147,7 @@ int main()
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud = CreateData();
 
 	// Get inliers using Ransac function
-	std::unordered_set<int> inliers = Ransac(cloud, 35, 2);
+	std::unordered_set<int> inliers = Ransac(cloud, 35, 0.6);
 
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloudInliers(new pcl::PointCloud<pcl::PointXYZ>());
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloudOutliers(new pcl::PointCloud<pcl::PointXYZ>());
