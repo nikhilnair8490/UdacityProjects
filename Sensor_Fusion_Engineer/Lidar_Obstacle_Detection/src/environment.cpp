@@ -55,8 +55,10 @@ void simpleHighway(pcl::visualization::PCLVisualizer::Ptr &viewer)
     // Segment the cloud in two parts Plane cloud (for road) and Obstacle cloud (for anything thats not road)
     std::pair<pcl::PointCloud<pcl::PointXYZ>::Ptr, pcl::PointCloud<pcl::PointXYZ>::Ptr> segmentCloud = processPointClouds->SegmentPlane(pointCloud, 50, 0.2);
     
-    int renderView;
-    renderView = 2;
+    // Create clusters from the obstacles cloud
+    std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> cloudClusters = processPointClouds->Clustering(segmentCloud.first, 1, 3, 30);
+
+    int renderView = 3;
     switch (renderView)
     {
         case 0:
@@ -76,6 +78,21 @@ void simpleHighway(pcl::visualization::PCLVisualizer::Ptr &viewer)
             // Render the point cloud with segmentation
             renderPointCloud(viewer,segmentCloud.first,"obstCloud",Color(1,0,0));
             renderPointCloud(viewer,segmentCloud.second,"planeCloud",Color(0,1,0));
+            break;
+        }
+        case 3:
+        {
+            // Render the cluster point cloud for all obstacles
+            int clusterId = 0;
+            std::vector<Color> colors = {Color(1,0,0), Color(0,1,0), Color(0,0,1)};
+            
+            for(pcl::PointCloud<pcl::PointXYZ>::Ptr cluster : cloudClusters)
+            {
+                std::cout << "cluster size ";
+                processPointClouds->numPoints(cluster);
+                renderPointCloud(viewer,cluster,"obstCloud"+std::to_string(clusterId),colors[clusterId]);
+                ++clusterId;
+            }
             break;
         }
         default:
@@ -121,7 +138,7 @@ void initCamera(CameraAngle setAngle, pcl::visualization::PCLVisualizer::Ptr &vi
 
 int main(int argc, char **argv)
 {
-    std::cout << "starting enviroment" << std::endl;
+    std::cout << "starting environment" << std::endl;
 
     pcl::visualization::PCLVisualizer::Ptr viewer(new pcl::visualization::PCLVisualizer("3D Viewer"));
     CameraAngle setAngle = XY;
