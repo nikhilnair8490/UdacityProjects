@@ -1,5 +1,5 @@
 /* \author Aaron Brown */
-// Nikhil Nair: Implement insert function
+// Nikhil Nair: Implement insert and search function
 // Quiz on implementing kd tree
 
 #include "../../render/render.h"
