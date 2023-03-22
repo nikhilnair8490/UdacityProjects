@@ -1,6 +1,7 @@
 // PCL lib Functions for processing point clouds
 
 #include "processPointClouds.h"
+#include <pcl/filters/crop_box.h>
 
 // constructor:
 template <typename PointT>
@@ -25,15 +26,45 @@ typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::FilterCloud(ty
 
     // Function to do voxel grid point reduction and region based filtering
     pcl::VoxelGrid<PointT> voxelFilter;
+    typename pcl::PointCloud<PointT>::Ptr cloudFiltered(new pcl::PointCloud<PointT>);
     voxelFilter.setInputCloud(cloud);
     voxelFilter.setLeafSize(filterRes, filterRes, filterRes); // Voxel cube size
-    voxelFilter.filter(*cloud);
+    voxelFilter.filter(*cloudFiltered);
+
+    // Region based filtering. Remove cloud points outside a defined region
+    typename pcl::PointCloud<PointT>::Ptr regionCloud(new pcl::PointCloud<PointT>);
+    pcl::CropBox<PointT> regionFilter(true);
+    regionFilter.setMin(minPoint);
+    regionFilter.setMax(maxPoint);
+    regionFilter.setInputCloud(cloudFiltered);
+    regionFilter.filter(*regionCloud);
+
+    // Filter out the points from roof of car
+    std::vector<int> roofIndices;
+    pcl::CropBox<PointT> roofFilter(true);
+    roofFilter.setMin(Eigen::Vector4f(-1.5, -1.7, -1, 1));
+    roofFilter.setMax(Eigen::Vector4f(2.6, 1.7, -0.4, 1));
+    roofFilter.setInputCloud(regionCloud);
+    roofFilter.filter(roofIndices);
+
+    // Extract the points from the regionCloud
+    pcl::PointIndices::Ptr roofInliers(new pcl::PointIndices);
+    for (int point : roofIndices)
+    {
+        roofInliers->indices.push_back(point);
+    }
+
+    pcl::ExtractIndices<PointT> extractIndices;
+    extractIndices.setInputCloud(regionCloud);
+    extractIndices.setIndices(roofInliers);
+    extractIndices.setNegative(true);
+    extractIndices.filter(*regionCloud);
 
     auto endTime = std::chrono::steady_clock::now();
     auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
     std::cout << "filtering took " << elapsedTime.count() << " milliseconds" << std::endl;
 
-    return cloud;
+    return regionCloud;
 }
 
 template <typename PointT>
