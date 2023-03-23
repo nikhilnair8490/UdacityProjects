@@ -118,9 +118,61 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr &viewer)
     pcl::PointCloud<pcl::PointXYZI>::Ptr inputCloud = pointProcessorI->loadPcd("../src/sensors/data/pcd/data_1/0000000000.pcd");
     // Filter the input cloud using pcl voxel filter
     pcl::PointCloud<pcl::PointXYZI>::Ptr filterCloud;
-    filterCloud = pointProcessorI->FilterCloud(inputCloud, 0.2f, Eigen::Vector4f(-12, -5, -8, 1), Eigen::Vector4f(30, 8, 10, 1));
-    renderPointCloud(viewer, filterCloud, "filterCloud");
-    // renderPointCloud(viewer, inputCloud, "inputCloud");
+    filterCloud = pointProcessorI->FilterCloud(inputCloud, 0.2f, Eigen::Vector4f(-10, -5, -3, 1), Eigen::Vector4f(30, 6, 0.8, 1));
+
+    // Segment the cloud in two parts Plane cloud (for road) and Obstacle cloud (for anything thats not road)
+    std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr, pcl::PointCloud<pcl::PointXYZI>::Ptr> segmentCloud = pointProcessorI->SegmentPlane(filterCloud, 50, 0.2);
+
+    // Create clusters from the obstacles cloud
+    std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters = pointProcessorI->Clustering(segmentCloud.first, 0.4, 10, 2000);
+
+    int renderView = 3;
+    switch (renderView)
+    {
+    case 0:
+    {
+        // Render raw input cloud
+        renderPointCloud(viewer, inputCloud, "inputCloud");
+        break;
+    }
+    case 1:
+    {
+        // Render filtered cloud
+        renderPointCloud(viewer, filterCloud, "filterCloud");
+        break;
+    }
+    case 2:
+    {
+        // Render the point cloud with segmentation
+        renderPointCloud(viewer, segmentCloud.first, "obstCloud", Color(1, 0, 0));
+        renderPointCloud(viewer, segmentCloud.second, "planeCloud", Color(0, 1, 0));
+        break;
+    }
+    case 3:
+    {
+        // Render the cluster point cloud for all obstacles
+        int clusterId = 0;
+        std::vector<Color> colors = {Color(1, 0, 0), Color(0, 1, 1), Color(0, 0, 1)};
+
+        for (pcl::PointCloud<pcl::PointXYZI>::Ptr cluster : cloudClusters)
+        {
+            std::cout << "cluster size ";
+            pointProcessorI->numPoints(cluster);
+            renderPointCloud(viewer, cluster, "obstCloud" + std::to_string(clusterId), colors[clusterId%colors.size()]);
+            // Create and render bounding box around each cluster
+            Box box = pointProcessorI->BoundingBox(cluster);
+            renderBox(viewer, box, clusterId);
+            ++clusterId;
+        }
+        // Render the point cloud with ground plane
+        renderPointCloud(viewer, segmentCloud.second, "planeCloud", Color(0, 1, 0));
+        break;
+    }
+    default:
+        // Render raw input cloud
+        renderPointCloud(viewer, inputCloud, "inputCloud");
+    }
+
 }
 
 // setAngle: SWITCH CAMERA ANGLE {XY, TopDown, Side, FPS}
