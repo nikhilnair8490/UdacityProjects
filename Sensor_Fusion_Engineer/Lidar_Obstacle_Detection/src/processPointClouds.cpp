@@ -1,7 +1,7 @@
 // PCL lib Functions for processing point clouds
 
 #include "processPointClouds.h"
-#include <pcl/filters/crop_box.h>
+#include "./quiz/ransac/ransac3d.cpp"
 
 // constructor:
 template <typename PointT>
@@ -99,21 +99,36 @@ std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT
     auto startTime = std::chrono::steady_clock::now();
     pcl::PointIndices::Ptr inliers{new pcl::PointIndices};
 
-    // Function to find inliers for the cloud. Inliers are  part of the segment plane (e.g road)
-    pcl::ModelCoefficients::Ptr coefficients(new pcl::ModelCoefficients);
-    // Create the segmentation object
-    pcl::SACSegmentation<PointT> seg;
-    // Optional
-    seg.setOptimizeCoefficients(true);
-    // Mandatory
-    seg.setModelType(pcl::SACMODEL_PLANE);       // Data model for thr Sample Consensus algorithm
-    seg.setMethodType(pcl::SAC_RANSAC);          // Random Sample Consensus algorithm
-    seg.setDistanceThreshold(distanceThreshold); // Determines how close a point must be to the model in order to be considered an inlier
-    seg.setMaxIterations(maxIterations);         // Maximum number of iterations for the Consensus
+    bool usePCLlib = false;
+    if (usePCLlib)
+    {
+        // Function to find inliers for the cloud. Inliers are  part of the segment plane (e.g road)
+        pcl::ModelCoefficients::Ptr coefficients(new pcl::ModelCoefficients);
+        // Create the segmentation object
+        pcl::SACSegmentation<PointT> seg;
+        // Optional
+        seg.setOptimizeCoefficients(true);
+        // Mandatory
+        seg.setModelType(pcl::SACMODEL_PLANE);       // Data model for thr Sample Consensus algorithm
+        seg.setMethodType(pcl::SAC_RANSAC);          // Random Sample Consensus algorithm
+        seg.setDistanceThreshold(distanceThreshold); // Determines how close a point must be to the model in order to be considered an inlier
+        seg.setMaxIterations(maxIterations);         // Maximum number of iterations for the Consensus
 
-    // Segment the largest planar component from the input cloud
-    seg.setInputCloud(cloud);
-    seg.segment(*inliers, *coefficients);
+        // Segment the largest planar component from the input cloud
+        seg.setInputCloud(cloud);
+        seg.segment(*inliers, *coefficients);
+    }
+    else
+    {
+        // Use the custom 3D RANSAC function for plane segmentation
+        std::unordered_set<int> inliersSet = Ransac3d<PointT>(cloud, maxIterations, distanceThreshold);
+
+        // Convert the unordered set to pcl::PointIndices inliers to be used in the SeparateClouds function
+        for (int index : inliersSet)
+        {
+            inliers->indices.push_back(index);
+        }
+    }
 
     if (inliers->indices.size() == 0)
     {
@@ -223,7 +238,7 @@ std::vector<boost::filesystem::path> ProcessPointClouds<PointT>::streamPcd(std::
 
     std::vector<boost::filesystem::path> paths(boost::filesystem::directory_iterator{dataPath}, boost::filesystem::directory_iterator{});
 
-    // sort files in accending order so playback is chronological
+    // sort files in ascending order so playback is chronological
     sort(paths.begin(), paths.end());
 
     return paths;
