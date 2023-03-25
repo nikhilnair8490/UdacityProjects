@@ -24,16 +24,16 @@ struct Node
 	}
 };
 
-struct KdTree
+struct KdTree2
 {
 	Node *root;
 
-	KdTree()
+	KdTree2()
 		: root(NULL)
 	{
 	}
 
-	~KdTree()
+	~KdTree2()
 	{
 		delete root;
 	}
