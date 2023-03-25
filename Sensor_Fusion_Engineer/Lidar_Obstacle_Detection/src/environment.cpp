@@ -114,8 +114,6 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr &viewer, ProcessPointCloud
     // -----Open 3D viewer and display City Block     -----
     // ----------------------------------------------------
 
-    // ProcessPointClouds<pcl::PointXYZI> *pointProcessorI = new ProcessPointClouds<pcl::PointXYZI>();
-    // pcl::PointCloud<pcl::PointXYZI>::Ptr inputCloud = pointProcessorI->loadPcd("../src/sensors/data/pcd/data_1/0000000000.pcd");
     //  Filter the input cloud using pcl voxel filter
     pcl::PointCloud<pcl::PointXYZI>::Ptr filterCloud;
     filterCloud = pointProcessorI->FilterCloud(inputCloud, 0.2f, Eigen::Vector4f(-10, -5, -3, 1), Eigen::Vector4f(30, 6, 0.8, 1));
@@ -209,22 +207,24 @@ int main(int argc, char **argv)
     std::cout << "starting environment" << std::endl;
 
     pcl::visualization::PCLVisualizer::Ptr viewer(new pcl::visualization::PCLVisualizer("3D Viewer"));
-    CameraAngle setAngle = XY;
+    CameraAngle setAngle = FPS;
     initCamera(setAngle, viewer);
     // simpleHighway(viewer);
-    // cityBlock(viewer);
+
+    // ProcessPointClouds<pcl::PointXYZI> *pointProcessorI = new ProcessPointClouds<pcl::PointXYZI>();
+    // pcl::PointCloud<pcl::PointXYZI>::Ptr inputCloud = pointProcessorI->loadPcd("../src/sensors/data/pcd/data_1/0000000001.pcd");
+    // cityBlock(viewer, pointProcessorI, inputCloud);
+    // // To render static frames
+    //  while (!viewer->wasStopped())
+    //  {
+    //      viewer->spinOnce();
+    //  }
 
     // Create point processor and point cloud objects for streaming
     ProcessPointClouds<pcl::PointXYZI> *pointProcessorI = new ProcessPointClouds<pcl::PointXYZI>();
     std::vector<boost::filesystem::path> stream = pointProcessorI->streamPcd("../src/sensors/data/pcd/data_1");
     auto streamIterator = stream.begin();
     pcl::PointCloud<pcl::PointXYZI>::Ptr inputCloudI;
-
-    // To render static frames
-    //  while (!viewer->wasStopped())
-    //  {
-    //      viewer->spinOnce();
-    //  }
 
     // Render streaming point cloud data
     while (!viewer->wasStopped())
