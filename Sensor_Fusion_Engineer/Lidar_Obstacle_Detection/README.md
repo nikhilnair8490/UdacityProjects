@@ -1,6 +1,6 @@
 # **LiDAR Obstacle Detection**
 
-<img src="media/25_WorkingwithRealPCD_StreamPCDs_3.gif" width="100%" height="100%">
+<img src="media/25_WorkingwithRealPCD_StreamPCDs_4.gif" width="100%" height="100%">
 
 \
 **LiDAR (Light Detection and Ranging)** uses eye-safe laser beams to “see” the world in 3D, providing machines and computers with an accurate representation of the surveyed environment. This 3D map is called a point cloud. An onboard computer can utilize the lidar point cloud for safe navigation.
