@@ -20,8 +20,8 @@ In this project i apply all the concepts that have learned for processing point 
 
 - Filtering (Voxel Grid Filter)
 - Cropping (Region of Interest)
-- Plane Segmentation (RANSAC [TBD Link])
-- Clustering (Euclidean Clustering [TBD Link])
+- Plane Segmentation ([RANSAC](/src/quiz/ransac/))
+- Clustering ([Euclidean Clustering](/src/quiz/cluster/))
 - Bounding Boxes
     
 The segmentation, and clustering methods are created from scratch and are my own implementation. The remaining methods are implemented using PCL library. Follow through the embedded links to learn more about the methods.
