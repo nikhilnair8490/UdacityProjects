@@ -15,7 +15,37 @@ Overall, RANSAC is a powerful algorithm that can help improve the robustness and
 
 We will implement the 2D and 3D RANSAC algorithm in this quiz. Our final goal is to identify a ground plane in a point cloud obtained from a lidar sensor mounted on an autonomous vehicle.
 
-## 2. 2D RANSAC
+## 2. How to run the code
+The code is implemented in the file `ransac2d.cpp` and `ransac3d.cpp`. The code is implemented in the `src/quiz/ransac` folder. The code can be compiled and run using the following commands:
+1. Clone this repository to your local machine
+```bash
+cd ~  
+git clone https://github.com/nikhilnair8490/UdacityProjects.git
+```
+2. Go to the project folder
+
+`UdacityProjects/Sensor_Fusion_Engineer/Lidar_Obstacle_Detection/src/quiz/ransac`
+
+3. Make a build directory in this folder: 
+```bash
+mkdir build && cd build
+```
+4. Run the following commands to build & view the 2d ransac:
+ ```bash
+CMake ..
+make
+./quizRansac
+```
+6. You should now see the visualization of the 2d point cloud data.
+
+7. Run the following commands to view the 3d ransac:
+ ```bash
+make
+./quizRansacPlane
+```
+8. You should now see the visualization of the 3d point cloud data.
+
+## 3. 2D RANSAC
 In this section, we will learn about the 2D RANSAC algorithm. Given a set of 2D points with some outliers, the algorithm will identify the line that best fits the points. The code is implemented in the file `ransac2d.cpp`.
 
 The left image is the input point cloud with some outliers. The right image is the output point cloud with the line that best fits the points (Green points are inliers and red points are outliers).
@@ -29,11 +59,15 @@ It also adds some outliers to the data points.
 - The function `Ransac` is used to implement the RANSAC 2D algorithm.
 The algorithm works by 
   - Randomly selecting a subset of points from the data points. For creating a line, we need two points.
-  - Fit a line to those points using the general equation of a line 
-  $$ Ax + By + C = 0 $$
+  - Fit a line to those points using the general equation of a line  
+  $$
+  Ax + By + C = 0
+  $$
   - Then, the algorithm computes the number of inliers, which are points that are close enough (`distanceTol`) to the line by calculating the shortest distance between each point in the cloud to the line
 
-  $$ \operatorname{distanceTol}(Ax+By+C=0, (x_0, y_0)) = \frac{|Ax_0+By_0+C|}{\sqrt{A^2+B^2}}. $$
+  $$ 
+  \operatorname{distanceTol}(Ax+By+C=0, (x_0, y_0)) = \frac{|Ax_0+By_0+C|}{\sqrt{A^2+B^2}}. 
+  $$
 
   - It will repeat the above steps and select the subset that produces the largest number of inliers. This subset is then used to compute the final estimate of the line parameters.
 
@@ -89,7 +123,7 @@ The algorithm works by
 		inliersResultTemp.clear();
 	}
 ```
-## 3. 3D RANSAC
+## 4. 3D RANSAC
 The 3D RANSAC is similar to the 2D but the equations are for plane rather than line. This algorithm is used to separate the ground plane (e.g road) from the rest of the point cloud which are obstacles. 
 The code is implemented in the file `ransac3d.cpp`.
 
@@ -104,12 +138,14 @@ The left gif is the input point cloud from a lidar sensor with the obstacles. Th
 The algorithm works by 
   - Randomly selecting a subset of points from the point cloud. For creating a plane we need 3 points.
   - Fit a plane to those points using the general equation of a plane  
-  $$ Ax + By + Cz + D = 0 $$
+  $$ 
+  Ax + By + Cz + D = 0 
+  $$
   - Then, the algorithm computes the number of inliers, which are points that are close enough (`distanceTol`) to the plane by calculating the shortest distance between each point in the cloud to the plane
 
-    $$ d = \frac{|Ax + By + Cz + D|}{\sqrt{A^2 + B^2 + C^2}} $$
-
-    $$ \operatorname{distanceTol}(Ax+By+Cz+D=0, (x_0, y_0, z_0)) = \frac{|Ax_0+By_0+Cz_0+D|}{\sqrt{A^2+B^2+C^2}}. $$
+    $$ 
+    \operatorname{distanceTol}(Ax+By+Cz+D=0, (x_0, y_0, z_0)) = \frac{|Ax_0+By_0+Cz_0+D|}{\sqrt{A^2+B^2+C^2}}. 
+    $$
 
   - It will repeat the above steps and select the subset that produces the largest number of inliers (largest plane in the cloud, which is ground plane). This subset is then used to compute the final estimate of the plane parameters.
 
@@ -183,7 +219,7 @@ for (size_t i = 0; i <= maxIterations; ++i)
 	}
 
 ```
-## 4. Important parameters to tune for RANSAC
+## 5. Important parameters to tune for RANSAC
 - `maxIterations`: The number of iterations to run the RANSAC algorithm. The higher the number of iterations, the more likely it is to find the correct model. However, the higher the number of iterations, the longer it will take to run the algorithm. The number of iteration is also related the percentage of outliers in the data set. The less outliers exist the less iteration we can expect.  
 > The equation of the minimum number of iterations N that is necessary to find a best fit with a probability of success p is given by the following equation:
 
