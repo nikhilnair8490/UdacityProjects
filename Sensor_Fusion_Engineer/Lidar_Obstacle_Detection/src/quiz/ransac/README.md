@@ -60,14 +60,10 @@ It also adds some outliers to the data points.
 The algorithm works by 
   - Randomly selecting a subset of points from the data points. For creating a line, we need two points.
   - Fit a line to those points using the general equation of a line  
-  $$
-  Ax + By + C = 0
-  $$
+  $$\bold{Ax + By + C = 0}$$
   - Then, the algorithm computes the number of inliers, which are points that are close enough (`distanceTol`) to the line by calculating the shortest distance between each point in the cloud to the line
 
-  $$ 
-  \operatorname{distanceTol}(Ax+By+C=0, (x_0, y_0)) = \frac{|Ax_0+By_0+C|}{\sqrt{A^2+B^2}}. 
-  $$
+  $$\operatorname{distanceTol}(Ax+By+C=0, (x_0, y_0)) = \frac{|Ax_0+By_0+C|}{\sqrt{A^2+B^2}}$$
 
   - It will repeat the above steps and select the subset that produces the largest number of inliers. This subset is then used to compute the final estimate of the line parameters.
 
@@ -138,14 +134,10 @@ The left gif is the input point cloud from a lidar sensor with the obstacles. Th
 The algorithm works by 
   - Randomly selecting a subset of points from the point cloud. For creating a plane we need 3 points.
   - Fit a plane to those points using the general equation of a plane  
-  $$ 
-  Ax + By + Cz + D = 0 
-  $$
+$$\bold{Ax + By + Cz + D = 0}$$
   - Then, the algorithm computes the number of inliers, which are points that are close enough (`distanceTol`) to the plane by calculating the shortest distance between each point in the cloud to the plane
 
-    $$ 
-    \operatorname{distanceTol}(Ax+By+Cz+D=0, (x_0, y_0, z_0)) = \frac{|Ax_0+By_0+Cz_0+D|}{\sqrt{A^2+B^2+C^2}}. 
-    $$
+$$\operatorname{distanceTol}(Ax+By+Cz+D=0, (x_0, y_0, z_0)) = \frac{|Ax_0+By_0+Cz_0+D|}{\sqrt{A^2+B^2+C^2}}$$
 
   - It will repeat the above steps and select the subset that produces the largest number of inliers (largest plane in the cloud, which is ground plane). This subset is then used to compute the final estimate of the plane parameters.
 
