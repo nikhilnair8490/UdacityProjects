@@ -58,9 +58,22 @@ void computeTTCCamera(std::vector<cv::KeyPoint> &kptsPrev, std::vector<cv::KeyPo
     double meanDistRatio = std::accumulate(distRatios.begin(), distRatios.end(), 0.0) / distRatios.size();
 
     double dT = 1 / frameRate;
-    TTC = -dT / (1 - meanDistRatio);
+    //TTC = -dT / (1 - meanDistRatio);
 
-    // TODO: STUDENT TASK (replacement for meanDistRatio)
+    // Alternate method to compute camera-based TTC from distance ratios using median
+    double medianDistRatio;
+
+    std::sort(distRatios.begin(), distRatios.end());
+    if (distRatios.size() % 2 == 0)
+    {
+      medianDistRatio = (distRatios[distRatios.size() / 2 - 1] + distRatios[distRatios.size() / 2]) / 2;
+    }
+    else 
+    {
+      medianDistRatio = distRatios[distRatios.size() / 2];
+    }
+  	
+  	TTC = -dT / (1 - medianDistRatio);
 }
 
 int main()
