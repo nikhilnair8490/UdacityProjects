@@ -16,7 +16,7 @@ void gradientSobel()
   
   	// Step 1 - load image from file
     cv::Mat img;
-    img = cv::imread("./img1.png");
+    img = cv::imread("../images/img1.png");
 
     //  Step 2 - convert image to grayscale
     cv::Mat imgGray;
