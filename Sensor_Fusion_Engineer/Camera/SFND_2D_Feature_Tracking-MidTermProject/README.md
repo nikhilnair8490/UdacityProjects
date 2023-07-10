@@ -53,3 +53,14 @@ make
 ./2D_feature_tracking
 ```
 6. You should now see the visualization.
+
+## Task MP.1 Data Buffer Optimization
+The data buffer is implemented as a ring buffer with a fixed size. The buffer is implemented as a vector of DataFrame. The size of the buffer is set to 2 (2 is Good for constant velocity models, 3 for constant acceelraton models).The buffer is updated in the function in the file `MidTermProject_Camera_Student.cpp`.
+
+```cpp
+if (dataBuffer.size() >= dataBufferSize)
+{
+   dataBuffer.erase(dataBuffer.begin());
+}
+```
+Above code snippet erases the first element of the vector if the size of the vector is greater than the required buffer size. This ensures that the run time buffer size is always equal to dataBufferSize. This code is implemented at the end of the  /* MAIN LOOP OVER ALL IMAGES */. This ensures that the buffer is updated after all the processing is done for the current frame and keeps the buffer size constant.  

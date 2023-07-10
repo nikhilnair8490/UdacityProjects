@@ -56,15 +56,14 @@ int main(int argc, const char *argv[])
         img = cv::imread(imgFullFilename);
         cv::cvtColor(img, imgGray, cv::COLOR_BGR2GRAY);
 
-        //// STUDENT ASSIGNMENT
-        //// TASK MP.1 -> replace the following code with ring buffer of size dataBufferSize
+        //// TASK MP.1 -> Implement ring buffer of size dataBufferSize
 
         // push image into data frame buffer
         DataFrame frame;
         frame.cameraImg = imgGray;
         dataBuffer.push_back(frame);
+        // Go to end of the for loop to see implementation of Task MP.1
 
-        //// EOF STUDENT ASSIGNMENT
         cout << "#1 : LOAD IMAGE INTO BUFFER done" << endl;
 
         /* DETECT IMAGE KEYPOINTS */
@@ -178,6 +177,16 @@ int main(int argc, const char *argv[])
             }
             bVis = false;
         }
+
+        //// TASK MP.1 -> Implement ring buffer of size dataBufferSize
+        // If the buffer size exceeds the limit then
+        // remove the oldest image from buffer 
+        if (dataBuffer.size() >= dataBufferSize)
+        {
+            dataBuffer.erase(dataBuffer.begin());
+        }
+
+        //cout << " Databuffer size after:" << dataBuffer.size();
 
     } // eof loop over all images
 
