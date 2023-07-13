@@ -63,4 +63,15 @@ if (dataBuffer.size() >= dataBufferSize)
    dataBuffer.erase(dataBuffer.begin());
 }
 ```
-Above code snippet erases the first element of the vector if the size of the vector is greater than the required buffer size. This ensures that the run time buffer size is always equal to dataBufferSize. This code is implemented at the end of the  /* MAIN LOOP OVER ALL IMAGES */. This ensures that the buffer is updated after all the processing is done for the current frame and keeps the buffer size constant.  
+Above code snippet erases the first element of the vector if the size of the vector is greater than the required buffer size. This ensures that the run time buffer size is always equal to dataBufferSize. This code is implemented at the end of the  /* MAIN LOOP OVER ALL IMAGES */. This ensures that the buffer is updated after all the processing is done for the current frame and keeps the buffer size constant.
+
+## Task MP.2 Keypoint Detection
+The following keypoint detectors are implemented in the file `matching2D_Student.cpp`: HARRIS, FAST, BRISK, ORB, AKAZE, and SIFT
+Each detector is implemented in a separate function with the following prototype:
+```cpp
+void detKeypointsHarris(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool bVis=false);
+void detKeypointsShiTomasi(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool bVis=false);
+void detKeypointsModern(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img, std::string detectorType, bool bVis=false);
+```
+The function `detKeypointsModern` is a generic function that can be used to call any of the modern keypoint detectors. The detector type is passed as a string to this function. The function `detKeypointsModern` calls the appropriate keypoint detector based on the detector type passed to it, for e.g. if the detector type is "FAST" then the function calls the `cv::FAST` keypoint detector.
+
