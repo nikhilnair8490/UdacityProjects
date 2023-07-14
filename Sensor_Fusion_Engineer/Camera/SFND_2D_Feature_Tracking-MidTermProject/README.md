@@ -75,3 +75,20 @@ void detKeypointsModern(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img, std:
 ```
 The function `detKeypointsModern` is a generic function that can be used to call any of the modern keypoint detectors. The detector type is passed as a string to this function. The function `detKeypointsModern` calls the appropriate keypoint detector based on the detector type passed to it, for e.g. if the detector type is "FAST" then the function calls the `cv::FAST` keypoint detector.
 
+## Task MP.3 Keypoint Removal
+The task implemented in the file `MidTermProject_Camera_Student.cpp` removes the keypoints that are outside the bounding box. The function iterates through all the keypoints and checks if the keypoint is inside the bounding box. If the keypoint is outside the bounding box, then it is removed from the vector of keypoints. To properly update the keypoint vector, we need to take care of the iterator. The iterator is incremented only if the keypoint is inside the bounding box. If the keypoint is outside the bounding box, then the iterator is not incremented. This ensures that the iterator is always pointing to the next keypoint that needs to be checked. The following code snippet shows the implementation of this task ([more details](https://stackoverflow.com/questions/8628951/remove-elements-of-a-vector-inside-the-loop))
+```cpp
+for(auto i = keypoints.begin(); i != keypoints.end();)
+{
+    if (!(vehicleRect.contains(i->pt)))
+    {
+        i = keypoints.erase(i);
+    }
+    else
+    {
+        ++i;
+    }
+}
+```
+
+

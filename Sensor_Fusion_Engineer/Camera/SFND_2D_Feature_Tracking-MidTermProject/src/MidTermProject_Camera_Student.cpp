@@ -85,21 +85,38 @@ int main(int argc, const char *argv[])
         }
         else
         {
-            detKeypointsModern(keypoints, imgGray, detectorType, true);
+            detKeypointsModern(keypoints, imgGray, detectorType, false);
         }
 
-        //// STUDENT ASSIGNMENT
         //// TASK MP.3 -> only keep keypoints on the preceding vehicle
-
         // only keep keypoints on the preceding vehicle
         bool bFocusOnVehicle = true;
-        cv::Rect vehicleRect(535, 180, 180, 150);
+        cv::Rect vehicleRect(535, 180, 180, 150); // Origin point of rect is top left corner
         if (bFocusOnVehicle)
         {
-            // ...
+            for(auto i = keypoints.begin(); i != keypoints.end();) //No ++i here
+            {
+                if (!(vehicleRect.contains(i->pt)))
+                {
+                    i = keypoints.erase(i); // Return value is iterator pointing to next element
+                }
+                else
+                {
+                    ++i; //Increment iterator only if keypt is inside bbox
+                }
+            }
         }
 
-        //// EOF STUDENT ASSIGNMENT
+        // visualize results
+        if (true)
+        {
+            cv::Mat visImage = imgGray.clone();
+            cv::drawKeypoints(imgGray, keypoints, visImage, cv::Scalar::all(-1), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+            string windowName = detectorType;
+            cv::namedWindow(windowName, 6);
+            imshow(windowName, visImage);
+            cv::waitKey(0);
+        } 
 
         // optional : limit number of keypoints (helpful for debugging and learning)
         bool bLimitKpts = false;
