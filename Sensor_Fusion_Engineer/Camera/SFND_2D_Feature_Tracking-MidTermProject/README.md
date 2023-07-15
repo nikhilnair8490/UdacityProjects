@@ -90,5 +90,43 @@ for(auto i = keypoints.begin(); i != keypoints.end();)
     }
 }
 ```
+## Task MP.4 Keypoint Descriptors
+The following keypoint descriptors are implemented in the file `matching2D_Student.cpp`: BRISK, BRIEF, ORB, FREAK, AKAZE and SIFT. Each descriptor is implemented in a a function with the following prototype and the type of descriptor is passed as a string (descriptorType) to the function:
+```cpp
+void descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descriptors, string descriptorType)
+```
+The function `descKeypoints` calls the appropriate descriptor based on the descriptor type passed to it, for e.g. if the descriptor type is "ORB" then the function calls the `cv::ORB::create()` and creates an ORB extractor which is then used to compute the ORB descriptors.
+Few important things to note:
+- BRISK, BRIEF, ORB, FREAK, AKAZE are binary descriptors and SIFT is an HOG (floating point) descriptor.
+- BRISK, ORB, AKAZE and SIFT have corresponding detectors also. BRIEF and FREAK are descriptors only and does not have a corresponding detectors.
 
+## Task MP.5 Descriptor Matching
+The following descriptor matching methods are implemented in the file `matching2D_Student.cpp`: BF, FLANN. The function `matchDescriptors` implements the descriptor matching. The function takes the following arguments:
+```cpp
+void matchDescriptors(std::vector<cv::KeyPoint> &kPtsSource, std::vector<cv::KeyPoint> &kPtsRef, cv::Mat &descSource, cv::Mat &descRef,
+                      std::vector<cv::DMatch> &matches, std::string descriptorType, std::string matcherType, std::string selectorType)
+```
+The function `matchDescriptors` calls the appropriate descriptor matcher based on the matcher type passed to it, for e.g. if the matcher type is "MAT_BF" then the function calls the `cv::BFMatcher::create()` and creates a BF matcher which is then used to match the descriptors.
+Some brief information about the BF and FLANN matcher: 
+- Brute-Force matcher takes the descriptor of one feature in first set and matches with all other features in second set using some distance calculation. And the closest one is returned as the best match. This is simple method but takes long time. 
+- FLANN stands for Fast Library for Approximate Nearest Neighbors. It contains a collection of algorithms optimized for fast nearest neighbor search in large datasets and for high dimensional features. FLANN based matcher uses the kd-tree algorithm. It takes the descriptor of one feature in first set and finds the closest cluster of features in second set using the kd-tree. And then it matches the closest feature in this cluster with the first feature. It is faster than BF matcher but is not always accurate.
+The norm type for matcher has to be decided based on the descriptor type. If the descriptor type is binary (e.g. BRISK, BRIEF etc), then the norm type is set to `cv::NORM_HAMMING` else it is set to `cv::NORM_L2` (For HOG based descriptiors like SIFT etc)
+```cpp
+int normType = descriptorType.compare("DES_BINARY") == 0 ? cv::NORM_HAMMING : cv::NORM_L2;
+``````
+The function also implements the selector type (NN, KNN) and the number of nearest neighbors (k) to be used for the KNN matcher.
+
+## Task MP.6 Descriptor Distance Ratio
+The function `matchDescriptors` implements the descriptor distance ratio test for the KNN matcher. The following code snippet shows the implementation of the descriptor distance ratio test:
+```cpp
+        const float ratio_thresh = 0.8f;
+        for (size_t i = 0; i < knn_matches.size(); i++)
+        {
+            if (knn_matches[i][0].distance < ratio_thresh * knn_matches[i][1].distance)
+            {
+                matches.push_back(knn_matches[i][0]);
+            }
+        }
+```
+The descriptor distance ratio test is implemented as a loop over all the matches returned by the KNN matcher. For each match, the ratio of the distance of the closest match to the distance of the second closest match is computed. If this ratio is less than the threshold, then the match is added to the vector of matches. The threshold is set to 0.8.
 
