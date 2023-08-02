@@ -41,12 +41,12 @@ int main(int argc, const char *argv[])
     bool bVis = false;            // visualize results
 
     // Detector Type
-    string detectorType = "ORB"; // SHITOMASI,HARRIS, FAST, BRISK, ORB, AKAZE, SIFT
+    string detectorType = "HARRIS"; // SHITOMASI,HARRIS, FAST, BRISK, ORB, AKAZE, SIFT
     //Descriptor Type
-    string descriptorType = "BRISK"; // BRISK, BRIEF, ORB, FREAK, AKAZE, SIFT
+    string descriptorType = "SIFT"; // BRISK, BRIEF, ORB, FREAK, AKAZE, SIFT Note: AKAZE Descriptors only work with AKAZE Keypoints
     //Matcher Type
     string matcherType = "MAT_BF";        // MAT_BF, MAT_FLANN
-    string descriptorCat = "DES_BINARY"; // DES_BINARY, DES_HOG
+    string descriptorCat = "DES_HOG"; // DES_BINARY, DES_HOG Note: Use DES_HOG for SIFT and BINARY for rest
     string selectorType = "SEL_KNN";       // SEL_NN, SEL_KNN
 
     // Stats for task MP7,8,9

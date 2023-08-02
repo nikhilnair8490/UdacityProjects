@@ -130,3 +130,26 @@ The function `matchDescriptors` implements the descriptor distance ratio test fo
 ```
 The descriptor distance ratio test is implemented as a loop over all the matches returned by the KNN matcher. For each match, the ratio of the distance of the closest match to the distance of the second closest match is computed. If this ratio is less than the threshold, then the match is added to the vector of matches. The threshold is set to 0.8.
 
+## Task MP.7 Performance Evaluation 1
+The following table and graph shows the number of keypoints detected, their execution time on the preceding vehicle for all 10 images in the data set for all the detectors implemented in this project.  The number of keypoints detected for each detector is averaged over all the 10 images in the data set.
+Based on the number of keypoints detected per ms the top three detectors are FAST, ORB and SHITOMASI. All three of them also have high neighbourhood distribution.
+The raw data is availabe in the excel sheet [here.]("PerformanceEvaluationData/PerformanceEvaluationSheet.xlsx") 
+
+
+<img src="images/TASKMP7.png" width="1200" height="300" />
+
+<img src="images/TaskMP7_MediankyPntDetected.png" width="480" height="350" />
+<img src="images/TaskMP7_MediankyPntDetExecTime.png" width="480" height="350" />
+<img src="images/TaskMP7_MediankyPntDetPerExecTime.png" width="480" height="350" />
+
+## Task MP.8 & 9 Performance Evaluation 2 & 3
+The following graphs shows the number of matched keypoints for all 10 images in the data set for all the detectors and descriptors implemented in this project. In the matching step, the BF approach is used with the descriptor distance ratio set to 0.8. The number of matched keypoints for each detector and descriptor is averaged over all the 10 images in the data set.
+The raw data is availabe in the excel sheet [here.]("PerformanceEvaluationData/PerformanceEvaluationSheet.xlsx")
+
+<img src="images/TaskMP8_9_MedianDescExecTime.png" width="480" height="350" />
+<img src="images/TaskMP8_9_MedianMatcherExecTime.png" width="480" height="350" />
+<img src="images/TaskMP8_9_MedianNoOfGoodMatches.png" width="480" height="350" />
+<img src="images/TaskMP8_9_PercentOfGoodMatches.png" width="480" height="350" />
+<img src="images/TaskMP8_9_TotalExecTime.png" width="480" height="350" />
+
+
