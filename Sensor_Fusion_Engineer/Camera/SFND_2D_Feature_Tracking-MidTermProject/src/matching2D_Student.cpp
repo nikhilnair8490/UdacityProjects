@@ -91,6 +91,7 @@ void descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descr
     else if (descriptorType.compare("SIFT") == 0) //HOG Descriptor
     {
         extractor = cv::SIFT::create();
+        //extractor = cv::xfeatures2d::SIFT::create(); //Use this for old versions of OpenCV
     }
     else
     {
@@ -300,6 +301,7 @@ void detKeypointsModern(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img, std:
         // SIFT detector
 
         detector = cv::SIFT::create();
+        //detector = cv::xfeatures2d::SIFT::create(); //Use this for old versions of OpenCV
         t = (double)cv::getTickCount();
         detector->detect(img, keypoints);
         t = ((double)cv::getTickCount() - t) / cv::getTickFrequency();

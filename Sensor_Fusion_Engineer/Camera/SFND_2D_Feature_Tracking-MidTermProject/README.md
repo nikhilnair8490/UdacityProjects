@@ -146,6 +146,28 @@ The raw data is availabe in the excel sheet [here.]("PerformanceEvaluationData/P
 The following graphs shows the number of matched keypoints for all 10 images in the data set for all the detectors and descriptors implemented in this project. In the matching step, the BF approach is used with the descriptor distance ratio set to 0.8. The number of matched keypoints for each detector and descriptor is averaged over all the 10 images in the data set.
 The raw data is availabe in the excel sheet [here.]("PerformanceEvaluationData/PerformanceEvaluationSheet.xlsx")
 
+To select the TOP 3 detector descriptor combination, i have used the following criteria:
+- The detector descriptor combination should have high % of good matched keypoints.
+  - The TOP 3 detector descriptor combination based on this criteria are: 
+    - SHITOMASI-SIFT (86.55%)
+    - SHITOMASI-ORB (85.71%)
+    - SHITOMASI-BRIEF (85.71%)
+The total execution time for these methods are 51.41 ms, 25.45 ms, 24.09 ms respectively.
+
+- The detector descriptor combination should have low execution time for Detection + Description + Matching.
+  - The TOP 3 detector descriptor combination based on this criteria are: 
+    - FAST-BRIEF (4.63 ms)
+    - FAST-BRISK (6.02 ms)
+    - FAST-ORB (6.42 ms)
+The % of matches for these methods are 82.27%, 66.89%, 
+81.61% respectively.
+
+Bsed on the data above the combinations which have good balance between the % of matched keypoints and the total execution time are:
+
+1. FAST-BRIEF
+2. FAST-ORB
+3. SHITOMASI-BRIEF
+
 <img src="images/TaskMP8_9_MedianDescExecTime.png" width="480" height="350" />
 <img src="images/TaskMP8_9_MedianMatcherExecTime.png" width="480" height="350" />
 <img src="images/TaskMP8_9_MedianNoOfGoodMatches.png" width="480" height="350" />
