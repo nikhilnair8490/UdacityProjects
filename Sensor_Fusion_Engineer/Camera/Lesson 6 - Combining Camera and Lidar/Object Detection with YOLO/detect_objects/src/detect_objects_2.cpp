@@ -7,13 +7,18 @@
 #include <opencv2/dnn.hpp>
 
 #include "dataStructures.h"
+#include <chrono>
 
 using namespace std;
 
 void detectObjects2()
 {
+    //Start chrono timer
+    auto start = std::chrono::high_resolution_clock::now();
+
     // load image from file
-    cv::Mat img = cv::imread("../images/s_thrun.jpg");
+    //cv::Mat img = cv::imread("../images/s_thrun.jpg");
+    cv::Mat img = cv::imread("../images/Sample-images-from-the-COCO-dataset.png");
 
     // load class names from file
     string yoloBasePath = "../dat/yolo/";
@@ -105,7 +110,11 @@ void detectObjects2()
         bBoxes.push_back(bBox);
     }
     
-    
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+
+    std::cout << "Time taken by function: " << duration.count() << " milliseconds" << std::endl;
+
     // show results
     cv::Mat visImg = img.clone();
     for (auto it = bBoxes.begin(); it != bBoxes.end(); ++it)
