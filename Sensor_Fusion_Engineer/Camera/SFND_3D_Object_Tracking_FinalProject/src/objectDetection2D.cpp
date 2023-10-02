@@ -111,6 +111,7 @@ void detectObjects(cv::Mat& img, std::vector<BoundingBox>& bBoxes, float confThr
             
             string label = cv::format("%.2f", (*it).confidence);
             label = classes[((*it).classID)] + ":" + label;
+            label  = label + ":" + std::to_string((*it).boxID);
         
             // Display label at the top of the bounding box
             int baseLine;
