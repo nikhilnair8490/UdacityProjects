@@ -109,9 +109,9 @@ void show3DObjects(std::vector<BoundingBox> &boundingBoxes, cv::Size worldSize, 
         // augment object with some key data
         char str1[200], str2[200];
         sprintf(str1, "id=%d, #pts=%d", it1->boxID, (int)it1->lidarPoints.size());
-        putText(topviewImg, str1, cv::Point2f(left - 250, bottom + 50), cv::FONT_ITALIC, 2, currColor);
+        putText(topviewImg, str1, cv::Point2f(left - 250, bottom + 50), cv::FONT_ITALIC, 0.8, currColor);
         sprintf(str2, "xmin=%2.2f m, yw=%2.2f m", xwmin, ywmax - ywmin);
-        putText(topviewImg, str2, cv::Point2f(left - 250, bottom + 125), cv::FONT_ITALIC, 2, currColor);
+        putText(topviewImg, str2, cv::Point2f(left - 250, bottom + 125), cv::FONT_ITALIC, 0.8, currColor);
     }
 
     // plot distance markers
@@ -147,10 +147,57 @@ void computeTTCCamera(std::vector<cv::KeyPoint> &kptsPrev, std::vector<cv::KeyPo
     // ...
 }
 
+/**
+ * @brief Compute time-to-collision (TTC) based on Lidar measurements
+ *
+ * @param lidarPointsPrev Previous Lidar points
+ * @param lidarPointsCurr Current Lidar points
+ * @param frameRate       Frame rate of the camera
+ * @param TTC             Output TTC
+ */
 void computeTTCLidar(std::vector<LidarPoint> &lidarPointsPrev,
                      std::vector<LidarPoint> &lidarPointsCurr, double frameRate, double &TTC)
 {
-    // ...
+    // auxiliary variables
+    double dT = 1.0 / frameRate; // time between two measurements in seconds
+    std::vector<double> lidarPointsPrevX, lidarPointsCurrX;
+    std::vector<double> filtLidarPointsPrevX, filtLidarPointsCurrX;
+
+    // Create vector of all x points from previous and current Lidar points
+    for (auto it = lidarPointsPrev.begin(); it != lidarPointsPrev.end(); ++it)
+    {
+        lidarPointsPrevX.push_back(it->x);
+    }
+
+    for (auto it = lidarPointsCurr.begin(); it != lidarPointsCurr.end(); ++it)
+    {
+        lidarPointsCurrX.push_back(it->x);
+    }
+
+    // Filter out outliers from the X-distance vector
+    filtLidarPointsPrevX = removeOutliers(lidarPointsPrevX);
+    filtLidarPointsCurrX = removeOutliers(lidarPointsCurrX);
+
+    // find closest distance to Lidar points within ego lane
+    double minXPrev = INT_MAX, minXCurr = INT_MAX;
+    for (auto it = filtLidarPointsPrevX.begin(); it != filtLidarPointsPrevX.end(); ++it)
+    {
+        minXPrev = minXPrev > *it ? *it : minXPrev;
+    }
+
+    for (auto it = filtLidarPointsCurrX.begin(); it != filtLidarPointsCurrX.end(); ++it)
+    {
+        minXCurr = minXCurr > *it ? *it : minXCurr;
+    }
+
+    //Print both the minimum X distances in same line
+    if (false)
+    {
+        std::cout << "minXPrev = " << minXPrev << " minXCurr = " << minXCurr << std::endl;
+    }
+
+    // compute TTC from both measurements
+    TTC = minXCurr * dT / (minXPrev - minXCurr);
 }
 
 /**
@@ -307,4 +354,59 @@ void matchBoundingBoxes(std::vector<cv::DMatch> &matches, std::map<int, int> &bb
             std::cout << "(" << it->first << ", " << it->second << "): " << std::endl;
         }
     }
+}
+
+/* Helper Functions */
+
+/**
+ * @brief Function to calculate the percentile of a sorted dataset
+ *
+ * @param data      Sorted dataset
+ * @param p         Percentile
+ * @return double   Value of the percentile
+ */
+double percentile(const std::vector<double> &data, double p)
+{
+    int N = data.size();
+    double n = (N - 1) * p + 1;
+
+    // If n is an integer, then percentile is a data point
+    if (n == floor(n))
+    {
+        return data[n - 1];
+    }
+    else
+    {
+        int k = floor(n);
+        double d = n - k;
+        return data[k - 1] + d * (data[k] - data[k - 1]);
+    }
+}
+
+/**
+ * @brief Function to remove outliers based on IQR
+ *
+ * @param data                  Input dataset
+ * @return std::vector<double>  Filtered dataset
+ */
+std::vector<double> removeOutliers(const std::vector<double> &data)
+{
+    std::vector<double> sorted_data = data;
+    std::sort(sorted_data.begin(), sorted_data.end());
+
+    double q1 = percentile(sorted_data, 0.25);
+    double q3 = percentile(sorted_data, 0.75);
+
+    double iqr = q3 - q1;
+
+    std::vector<double> filtered_data;
+    for (double x : data)
+    {
+        if (x >= q1 - 1.5 * iqr && x <= q3 + 1.5 * iqr)
+        {
+            filtered_data.push_back(x);
+        }
+    }
+
+    return filtered_data;
 }

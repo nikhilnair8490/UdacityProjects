@@ -110,12 +110,12 @@ int main(int argc, const char *argv[])
 
     // Detector Type
     string detectorType = "SHITOMASI"; // SHITOMASI,HARRIS, FAST, BRISK, ORB, AKAZE, SIFT
-    //Descriptor Type
+    // Descriptor Type
     string descriptorType = "BRIEF"; // BRISK, BRIEF, ORB, FREAK, AKAZE, SIFT Note: AKAZE Descriptors only work with AKAZE Keypoints
-    //Matcher Type
-    string matcherType = "MAT_BF";        // MAT_BF, MAT_FLANN
+    // Matcher Type
+    string matcherType = "MAT_BF";       // MAT_BF, MAT_FLANN
     string descriptorCat = "DES_BINARY"; // DES_BINARY, DES_HOG Note: Use DES_HOG for SIFT and BINARY for rest
-    string selectorType = "SEL_KNN";       // SEL_NN, SEL_KNN
+    string selectorType = "SEL_KNN";     // SEL_NN, SEL_KNN
 
     // Stats
     double executionTime_KeyPtDet;
@@ -186,14 +186,14 @@ int main(int argc, const char *argv[])
         bVis = true;
         if (bVis)
         {
-            show3DObjects((dataBuffer.end() - 1)->boundingBoxes, cv::Size(4.0, 20.0), cv::Size(2000 / 4, 2000 / 4), true);
+            show3DObjects((dataBuffer.end() - 1)->boundingBoxes, cv::Size(4.0, 20.0), cv::Size(800, 800), true);
         }
         bVis = false;
 
         cout << "#4 : CLUSTER LIDAR POINT CLOUD done" << endl;
 
         // REMOVE THIS LINE BEFORE PROCEEDING WITH THE FINAL PROJECT
-        //continue; // skips directly to the next image without processing what comes beneath
+        // continue; // skips directly to the next image without processing what comes beneath
 
         /* DETECT IMAGE KEYPOINTS */
 
@@ -269,7 +269,9 @@ int main(int argc, const char *argv[])
             map<int, int> bbBestMatches;
             matchBoundingBoxes(matches, bbBestMatches, *(dataBuffer.end() - 2), *(dataBuffer.end() - 1)); // associate bounding boxes between current and previous frame using keypoint matches
             //// EOF STUDENT ASSIGNMENT
-            continue;
+
+            // continue;
+
             // store matches in current data frame
             (dataBuffer.end() - 1)->bbMatches = bbBestMatches;
 
@@ -306,6 +308,11 @@ int main(int argc, const char *argv[])
                     double ttcLidar;
                     computeTTCLidar(prevBB->lidarPoints, currBB->lidarPoints, sensorFrameRate, ttcLidar);
                     //// EOF STUDENT ASSIGNMENT
+                    if (false)
+                    {
+                        std::cout << "prevBB: " << prevBB->boxID << "currBB: " << currBB->boxID << std::endl;
+                        std::cout << "TTC Lidar = " << ttcLidar << std::endl;
+                    }
 
                     //// STUDENT ASSIGNMENT
                     //// TASK FP.3 -> assign enclosed keypoint matches to bounding box (implement -> clusterKptMatchesWithROI)
@@ -336,6 +343,13 @@ int main(int argc, const char *argv[])
 
                 } // eof TTC computation
             }     // eof loop over all BB matches
+        }
+
+        // If the buffer size exceeds the limit then
+        // remove the oldest image from buffer
+        if (dataBuffer.size() >= dataBufferSize)
+        {
+            dataBuffer.erase(dataBuffer.begin());
         }
 
     } // eof loop over all images
