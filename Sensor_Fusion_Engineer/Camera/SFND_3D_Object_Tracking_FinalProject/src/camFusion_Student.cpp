@@ -134,17 +134,138 @@ void show3DObjects(std::vector<BoundingBox> &boundingBoxes, cv::Size worldSize, 
     }
 }
 
-// associate a given bounding box with the keypoints it contains
+/**
+ * @brief Cluster keypoint matches with the current bounding box
+ *
+ * @param boundingBox   Current bounding box
+ * @param kptsPrev      Previous frame keypoints
+ * @param kptsCurr      Current frame keypoints
+ * @param kptMatches    Keypoint matches between previous and current frame
+ */
 void clusterKptMatchesWithROI(BoundingBox &boundingBox, std::vector<cv::KeyPoint> &kptsPrev, std::vector<cv::KeyPoint> &kptsCurr, std::vector<cv::DMatch> &kptMatches)
 {
-    // ...
+    /* STEP 1: Associate the keypoint match with the bounding box and calculate keypoint match distance*/
+
+    // Loop through all the keypoint matches and find the ones which are part of the current bounding box
+    // Also find the distance between the matched keypoints
+    std::vector<double> distKptMatches;
+    for (auto it = kptMatches.begin(); it != kptMatches.end(); ++it)
+    {
+        cv::KeyPoint keyPtPrev, keyPtCurr;
+        double dist;
+        keyPtPrev = kptsPrev[it->queryIdx];
+        keyPtCurr = kptsCurr[it->trainIdx];
+
+        if (boundingBox.roi.contains(keyPtCurr.pt))
+        {
+            boundingBox.kptMatches.push_back(*it);
+            dist = cv::norm(keyPtCurr.pt - keyPtPrev.pt);
+            distKptMatches.push_back(dist);
+        }
+    }
+
+    /*STEP 2: Remove outlier keypoint matches from the bounding box*/
+
+    // Get the Q1 and Q3 percentile for the distance vector
+    double q1 = percentile(distKptMatches, 0.25);
+    double q3 = percentile(distKptMatches, 0.75);
+    // Find the IQR for the distance vector
+    double iqr = q3 - q1;
+
+    // Go through all the matched keypoint pairs in the current bounding box and remove the ones which are outliers from the bounding box
+    for (auto it = boundingBox.kptMatches.begin(); it != boundingBox.kptMatches.end(); ++it)
+    {
+        cv::KeyPoint keyPtPrev, keyPtCurr;
+        double dist;
+        keyPtPrev = kptsPrev[it->queryIdx];
+        keyPtCurr = kptsCurr[it->trainIdx];
+        dist = cv::norm(keyPtCurr.pt - keyPtPrev.pt);
+
+        if ((dist < (q1 - 1.5 * iqr)) || (dist > (q3 + 1.5 * iqr)))
+        {
+            boundingBox.kptMatches.erase(it);
+        }
+    }
 }
 
 // Compute time-to-collision (TTC) based on keypoint correspondences in successive images
 void computeTTCCamera(std::vector<cv::KeyPoint> &kptsPrev, std::vector<cv::KeyPoint> &kptsCurr,
                       std::vector<cv::DMatch> kptMatches, double frameRate, double &TTC, cv::Mat *visImg)
 {
-    // ...
+    /* STEP 1: Compute distance ratios between all matched keypoints*/
+
+    vector<double> distRatios; // stores the distance ratios for all keypoints between curr. and prev. frame
+    for (auto it1 = kptMatches.begin(); it1 != kptMatches.end() - 1; ++it1)
+    { // outer keypoint match  loop
+
+        // get current keypoint and its matched partner in the prev. frame
+        cv::KeyPoint kpOuterCurr = kptsCurr.at(it1->trainIdx);
+        cv::KeyPoint kpOuterPrev = kptsPrev.at(it1->queryIdx);
+
+        for (auto it2 = kptMatches.begin() + 1; it2 != kptMatches.end(); ++it2)
+        { // inner keypoint match loop
+
+            double minDist = 100.0; // min. required distance in pixels
+
+            // get next keypoint and its matched partner in the prev. frame
+            cv::KeyPoint kpInnerCurr = kptsCurr.at(it2->trainIdx);
+            cv::KeyPoint kpInnerPrev = kptsPrev.at(it2->queryIdx);
+
+            // compute distances and distance ratios
+            double distCurr = cv::norm(kpOuterCurr.pt - kpInnerCurr.pt);
+            double distPrev = cv::norm(kpOuterPrev.pt - kpInnerPrev.pt);
+
+            if (distPrev > std::numeric_limits<double>::epsilon() && distCurr >= minDist)
+            { // avoid division by zero
+
+                double distRatio = distCurr / distPrev;
+                distRatios.push_back(distRatio);
+            }
+        } // eof inner loop over all matched kpts
+    }     // eof outer loop over all matched kpts
+
+    // only continue if list of distance ratios is not empty
+    if (distRatios.size() == 0)
+    {
+        TTC = NAN;
+        return;
+    }
+
+    /* STEP 2: Filter out outliers from the distance ratio vector*/
+
+    // Remove the outliers from the distance ratio vector
+    std::vector<double> filtDistRatios = removeOutliers(distRatios);
+    // Copy original distance ratio vector to filtered distance ratio vector
+    // filtDistRatios = distRatios;
+
+    /* STEP 3: Compute camera-based TTC from distance ratios*/
+
+    // compute camera-based TTC from mean distance ratios
+    double meanDistRatio = std::accumulate(filtDistRatios.begin(), filtDistRatios.end(), 0.0) / filtDistRatios.size();
+
+    double dT = 1 / frameRate;
+    // TTC = -dT / (1 - meanDistRatio);
+
+    // Alternate method to compute camera-based TTC from distance ratios using median
+    double medianDistRatio;
+
+    std::sort(filtDistRatios.begin(), filtDistRatios.end());
+    if (distRatios.size() % 2 == 0)
+    {
+        medianDistRatio = (filtDistRatios[filtDistRatios.size() / 2 - 1] + filtDistRatios[filtDistRatios.size() / 2]) / 2;
+    }
+    else
+    {
+        medianDistRatio = filtDistRatios[filtDistRatios.size() / 2];
+    }
+
+    TTC = -dT / (1 - medianDistRatio);
+
+    // Print the mean and median distance ratios
+    if (false)
+    {
+        std::cout << "meanDistRatio = " << meanDistRatio << " medianDistRatio = " << medianDistRatio << std::endl;
+    }
 }
 
 /**
@@ -190,7 +311,7 @@ void computeTTCLidar(std::vector<LidarPoint> &lidarPointsPrev,
         minXCurr = minXCurr > *it ? *it : minXCurr;
     }
 
-    //Print both the minimum X distances in same line
+    // Print both the minimum X distances in same line
     if (false)
     {
         std::cout << "minXPrev = " << minXPrev << " minXCurr = " << minXCurr << std::endl;
@@ -252,7 +373,7 @@ void matchBoundingBoxes(std::vector<cv::DMatch> &matches, std::map<int, int> &bb
         }
 
         // Store the box ID pairs in a temporary multimap
-        if ((prevImgBoxID != -1) && (currImgBoxID != -1)) // Exlcude pairs which are not part of either BBoxes
+        if ((prevImgBoxID != -1) && (currImgBoxID != -1)) // Exclude pairs which are not part of either BBoxes
         {
             bbTempMatches.insert(std::make_pair(prevImgBoxID, currImgBoxID));
         }
@@ -340,7 +461,7 @@ void matchBoundingBoxes(std::vector<cv::DMatch> &matches, std::map<int, int> &bb
             }
         }
 
-        if ((BBoxIdx1 != -1) && (BBoxIdx2 != -1)) // Exlcude pairs which are not part of either BBoxes
+        if ((BBoxIdx1 != -1) && (BBoxIdx2 != -1)) // Exclude pairs which are not part of either BBoxes
         {
             bbBestMatches.insert(std::make_pair(BBoxIdx1, BBoxIdx2));
         }
