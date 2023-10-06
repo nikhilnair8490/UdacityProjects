@@ -173,17 +173,22 @@ void clusterKptMatchesWithROI(BoundingBox &boundingBox, std::vector<cv::KeyPoint
     double iqr = q3 - q1;
 
     // Go through all the matched keypoint pairs in the current bounding box and remove the ones which are outliers from the bounding box
-    for (auto it = boundingBox.kptMatches.begin(); it != boundingBox.kptMatches.end(); ++it)
+    auto it1 = boundingBox.kptMatches.begin();
+    while (it1 != boundingBox.kptMatches.end())
     {
         cv::KeyPoint keyPtPrev, keyPtCurr;
         double dist;
-        keyPtPrev = kptsPrev[it->queryIdx];
-        keyPtCurr = kptsCurr[it->trainIdx];
+        keyPtPrev = kptsPrev[it1->queryIdx];
+        keyPtCurr = kptsCurr[it1->trainIdx];
         dist = cv::norm(keyPtCurr.pt - keyPtPrev.pt);
 
         if ((dist < (q1 - 1.5 * iqr)) || (dist > (q3 + 1.5 * iqr)))
         {
-            boundingBox.kptMatches.erase(it);
+            it1 = boundingBox.kptMatches.erase(it1); //erase() returns the next iterator
+        }
+        else
+        {
+            ++it1;
         }
     }
 }
@@ -482,12 +487,15 @@ void matchBoundingBoxes(std::vector<cv::DMatch> &matches, std::map<int, int> &bb
 /**
  * @brief Function to calculate the percentile of a sorted dataset
  *
- * @param data      Sorted dataset
+ * @param dataIn    Input dataset
  * @param p         Percentile
  * @return double   Value of the percentile
  */
-double percentile(const std::vector<double> &data, double p)
+double percentile(const std::vector<double> &dataIn, double p)
 {
+    std::vector<double> data = dataIn;
+    std::sort(data.begin(), data.end());
+
     int N = data.size();
     double n = (N - 1) * p + 1;
 
