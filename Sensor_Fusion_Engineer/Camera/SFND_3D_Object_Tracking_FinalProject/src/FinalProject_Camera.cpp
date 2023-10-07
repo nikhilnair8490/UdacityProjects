@@ -193,7 +193,7 @@ int main(int argc, const char *argv[])
         bVis = true;
         if (bVis)
         {
-            show3DObjects((dataBuffer.end() - 1)->boundingBoxes, cv::Size(4.0, 20.0), cv::Size(800, 800), true);
+            show3DObjects((dataBuffer.end() - 1)->boundingBoxes, cv::Size(4.0, 20.0), cv::Size(2000, 2000), imgIndex, true);
         }
         bVis = false;
 
@@ -346,8 +346,20 @@ int main(int argc, const char *argv[])
                         string windowName = "Matching keypoints between two camera images";
                         cv::namedWindow(windowName, 7);
                         cv::imshow(windowName, resizeMatchImg);
-                        cout << "Press key to continue to next image" << endl;
-                        cv::waitKey(0); // wait for key to be pressed
+                        // Save images in output file if true
+                        if (true)
+                        {
+                            // Specify the file name and format (PNG in this case)
+                            std::string filenameOut0 = "KeyPtMatch_" + std::to_string(imgIndex) + ".png";
+
+                            // Save the image to the specified file
+                            bool success = cv::imwrite(filenameOut0, resizeMatchImg);
+                        }
+                        else
+                        {
+                            cout << "Press key to continue to next frame" << endl;
+                            cv::waitKey(0);
+                        }
                     }
                     bVis = false;
 
@@ -368,14 +380,28 @@ int main(int argc, const char *argv[])
                         cv::rectangle(visImg, cv::Point(currBB->roi.x, currBB->roi.y), cv::Point(currBB->roi.x + currBB->roi.width, currBB->roi.y + currBB->roi.height), cv::Scalar(0, 255, 0), 2);
 
                         char str[200];
-                        sprintf(str, "TTC Lidar : %f s, TTC Camera : %f s", ttcLidar, ttcCamera);
+                        // sprintf(str, "Frame: %zu", imgIndex);
+                        sprintf(str, "Frame: %zu, TTC Lidar : %f s, TTC Camera : %f s", imgIndex, ttcLidar, ttcCamera);
                         putText(visImg, str, cv::Point2f(80, 50), cv::FONT_HERSHEY_PLAIN, 2, cv::Scalar(0, 0, 255));
 
                         string windowName = "Final Results : TTC";
                         cv::namedWindow(windowName, 4);
                         cv::imshow(windowName, visImg);
-                        cout << "Press key to continue to next frame" << endl;
-                        cv::waitKey(0);
+
+                        // Save images in output file if true
+                        if (false)
+                        {
+                            // Specify the file name and format (PNG in this case)
+                            std::string filenameOut = "Finalframe_" + std::to_string(imgIndex) + ".png";
+
+                            // Save the image to the specified file
+                            bool success = cv::imwrite(filenameOut, visImg);
+                        }
+                        else
+                        {
+                            cout << "Press key to continue to next frame" << endl;
+                            cv::waitKey(0);
+                        }
                     }
                     bVis = false;
 

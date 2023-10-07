@@ -66,7 +66,7 @@ void clusterLidarWithROI(std::vector<BoundingBox> &boundingBoxes, std::vector<Li
  * However, you can make this function work for other sizes too.
  * For instance, to use a 1000x1000 size, adjusting the text positions by dividing them by 2.
  */
-void show3DObjects(std::vector<BoundingBox> &boundingBoxes, cv::Size worldSize, cv::Size imageSize, bool bWait)
+void show3DObjects(std::vector<BoundingBox> &boundingBoxes, cv::Size worldSize, cv::Size imageSize, size_t &imgIndex, bool bWait)
 {
     // create topview image
     cv::Mat topviewImg(imageSize, CV_8UC3, cv::Scalar(255, 255, 255));
@@ -115,7 +115,7 @@ void show3DObjects(std::vector<BoundingBox> &boundingBoxes, cv::Size worldSize, 
     }
 
     // plot distance markers
-    float lineSpacing = 0.5; // gap between distance markers
+    float lineSpacing = 2.0; // gap between distance markers
     int nMarkers = floor(worldSize.height / lineSpacing);
     for (size_t i = 0; i < nMarkers; ++i)
     {
@@ -128,9 +128,21 @@ void show3DObjects(std::vector<BoundingBox> &boundingBoxes, cv::Size worldSize, 
     cv::namedWindow(windowName, 1);
     cv::imshow(windowName, topviewImg);
 
-    if (bWait)
+    // Save images in output file if true
+    if (false)
     {
-        cv::waitKey(0); // wait for key to be pressed
+        // Specify the file name and format (PNG in this case)
+        std::string filenameOut1 = "TopViewImage_" + std::to_string(imgIndex) + ".png";
+
+        // Save the image to the specified file
+        bool success = cv::imwrite(filenameOut1, topviewImg);
+    }
+    else
+    {
+        if (bWait)
+        {
+            cv::waitKey(0); // wait for key to be pressed
+        }
     }
 }
 
@@ -184,7 +196,7 @@ void clusterKptMatchesWithROI(BoundingBox &boundingBox, std::vector<cv::KeyPoint
 
         if ((dist < (q1 - 1.5 * iqr)) || (dist > (q3 + 1.5 * iqr)))
         {
-            it1 = boundingBox.kptMatches.erase(it1); //erase() returns the next iterator
+            it1 = boundingBox.kptMatches.erase(it1); // erase() returns the next iterator
         }
         else
         {
@@ -193,7 +205,16 @@ void clusterKptMatchesWithROI(BoundingBox &boundingBox, std::vector<cv::KeyPoint
     }
 }
 
-// Compute time-to-collision (TTC) based on keypoint correspondences in successive images
+/**
+ * @brief Compute time-to-collision (TTC) based on keypoint correspondences in successive images
+ * 
+ * @param kptsPrev      Previous frame keypoints
+ * @param kptsCurr      Current frame keypoints
+ * @param kptMatches    Keypoint matches between previous and current frame
+ * @param frameRate     Frame rate of the camera 
+ * @param TTC           Output TTC
+ * @param visImg        Output visualization image
+ */
 void computeTTCCamera(std::vector<cv::KeyPoint> &kptsPrev, std::vector<cv::KeyPoint> &kptsCurr,
                       std::vector<cv::DMatch> kptMatches, double frameRate, double &TTC, cv::Mat *visImg)
 {
@@ -324,7 +345,7 @@ void computeTTCLidar(std::vector<LidarPoint> &lidarPointsPrev,
 
     // compute TTC from both measurements
     TTC = minXCurr * dT / (minXPrev - minXCurr);
-    // Compute velocity 
+    // Compute velocity
     velLidar = (minXPrev - minXCurr) / dT;
 }
 
