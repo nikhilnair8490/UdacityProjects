@@ -115,7 +115,7 @@ void show3DObjects(std::vector<BoundingBox> &boundingBoxes, cv::Size worldSize, 
     }
 
     // plot distance markers
-    float lineSpacing = 2.0; // gap between distance markers
+    float lineSpacing = 0.5; // gap between distance markers
     int nMarkers = floor(worldSize.height / lineSpacing);
     for (size_t i = 0; i < nMarkers; ++i)
     {
@@ -282,7 +282,7 @@ void computeTTCCamera(std::vector<cv::KeyPoint> &kptsPrev, std::vector<cv::KeyPo
  * @param TTC             Output TTC
  */
 void computeTTCLidar(std::vector<LidarPoint> &lidarPointsPrev,
-                     std::vector<LidarPoint> &lidarPointsCurr, double frameRate, double &TTC)
+                     std::vector<LidarPoint> &lidarPointsCurr, double frameRate, double &TTC, double &velLidar)
 {
     // auxiliary variables
     double dT = 1.0 / frameRate; // time between two measurements in seconds
@@ -324,6 +324,8 @@ void computeTTCLidar(std::vector<LidarPoint> &lidarPointsPrev,
 
     // compute TTC from both measurements
     TTC = minXCurr * dT / (minXPrev - minXCurr);
+    // Compute velocity 
+    velLidar = (minXPrev - minXCurr) / dT;
 }
 
 /**

@@ -131,6 +131,10 @@ int main(int argc, const char *argv[])
     int numMatches;
     vector<int> numMatchesArr;
 
+    vector<double> TTC_LidarArr;
+    vector<double> velLidarArr;
+    vector<double> TTC_CameraArr;
+
     /* MAIN LOOP OVER ALL IMAGES */
 
     for (size_t imgIndex = 0; imgIndex <= imgEndIndex - imgStartIndex; imgIndex += imgStepWidth)
@@ -309,13 +313,16 @@ int main(int argc, const char *argv[])
                     //// STUDENT ASSIGNMENT
                     //// TASK FP.2 -> compute time-to-collision based on Lidar data (implement -> computeTTCLidar)
                     double ttcLidar;
-                    computeTTCLidar(prevBB->lidarPoints, currBB->lidarPoints, sensorFrameRate, ttcLidar);
+                    double velLidar;
+                    computeTTCLidar(prevBB->lidarPoints, currBB->lidarPoints, sensorFrameRate, ttcLidar, velLidar);
                     //// EOF STUDENT ASSIGNMENT
                     if (false)
                     {
                         std::cout << "prevBB: " << prevBB->boxID << "currBB: " << currBB->boxID << std::endl;
                         std::cout << "TTC Lidar = " << ttcLidar << std::endl;
                     }
+                    TTC_LidarArr.push_back(ttcLidar);
+                    velLidarArr.push_back(velLidar);
 
                     //// STUDENT ASSIGNMENT
                     //// TASK FP.3 -> assign enclosed keypoint matches to bounding box (implement -> clusterKptMatchesWithROI)
@@ -350,6 +357,7 @@ int main(int argc, const char *argv[])
                     {
                         std::cout << "TTC Camera = " << ttcCamera << std::endl;
                     }
+                    TTC_CameraArr.push_back(ttcCamera);
                     //// EOF STUDENT ASSIGNMENT
 
                     bVis = false;
@@ -383,6 +391,18 @@ int main(int argc, const char *argv[])
         }
 
     } // eof loop over all images
+
+    // Stats for Task FP5
+
+    // Print both TTC Lidar and velocity Lidar in same line with comma seperator
+    cout<< "\n TTC Lidar, velLidar "<< endl;
+    for(int i=0; i<TTC_LidarArr.size(); i++)
+    {
+        cout<< TTC_LidarArr[i] << ", " << velLidarArr[i] << "\n";
+    }
+
+    cout<<"\n .................... \n";
+
 
     return 0;
 }
