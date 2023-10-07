@@ -139,9 +139,9 @@ int main(int argc, const char *argv[])
 
     for (size_t imgIndex = 0; imgIndex <= imgEndIndex - imgStartIndex; imgIndex += imgStepWidth)
     {
-        //Image Index
+        // Image Index
         cout << "Image Index: " << imgIndex << endl;
-        
+
         /* LOAD IMAGE INTO BUFFER */
 
         // assemble filenames for current index
@@ -190,7 +190,7 @@ int main(int argc, const char *argv[])
         clusterLidarWithROI((dataBuffer.end() - 1)->boundingBoxes, (dataBuffer.end() - 1)->lidarPoints, shrinkFactor, P_rect_00, R_rect_00, RT);
 
         // Visualize 3D objects
-        bVis = false;
+        bVis = true;
         if (bVis)
         {
             show3DObjects((dataBuffer.end() - 1)->boundingBoxes, cv::Size(4.0, 20.0), cv::Size(800, 800), true);
@@ -360,7 +360,7 @@ int main(int argc, const char *argv[])
                     TTC_CameraArr.push_back(ttcCamera);
                     //// EOF STUDENT ASSIGNMENT
 
-                    bVis = false;
+                    bVis = true;
                     if (bVis)
                     {
                         cv::Mat visImg = (dataBuffer.end() - 1)->cameraImg.clone();
@@ -395,14 +395,22 @@ int main(int argc, const char *argv[])
     // Stats for Task FP5
 
     // Print both TTC Lidar and velocity Lidar in same line with comma seperator
-    cout<< "\n TTC Lidar, velLidar "<< endl;
-    for(int i=0; i<TTC_LidarArr.size(); i++)
+    cout << "\n TTC Lidar, velLidar " << endl;
+    for (int i = 0; i < TTC_LidarArr.size(); i++)
     {
-        cout<< TTC_LidarArr[i] << ", " << velLidarArr[i] << "\n";
+        cout << TTC_LidarArr[i] << ", " << velLidarArr[i] << "\n";
     }
 
-    cout<<"\n .................... \n";
+    cout << "\n .................... \n";
 
+    // Print TTC Camera
+    cout << "\n TTC Camera " << endl;
+    for (int i = 0; i < TTC_CameraArr.size(); i++)
+    {
+        cout << TTC_CameraArr[i] << " ";
+    }
+
+    cout << "\n .................... \n";
 
     return 0;
 }
