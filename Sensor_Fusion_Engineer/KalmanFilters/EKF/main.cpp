@@ -20,10 +20,12 @@ int main() {
   /**
    * Set Measurements
    */
+  cout<<"print";
   vector<MeasurementPackage> measurement_pack_list;
 
   // hardcoded input file with laser and radar measurements
   string in_file_name_ = "../obj_pose-laser-radar-synthetic-input.txt";
+  //string in_file_name_ = "obj_pose-laser-radar-synthetic-input.txt";
   ifstream in_file(in_file_name_.c_str(), ifstream::in);
 
   if (!in_file.is_open()) {
@@ -55,8 +57,19 @@ int main() {
       measurement_pack_list.push_back(meas_package);
 
     } else if (sensor_type.compare("R") == 0) {
-      // Skip Radar measurements
-      continue;
+      // read measurements
+      meas_package.sensor_type_ = MeasurementPackage::RADAR;
+      meas_package.raw_measurements_ = VectorXd(3);
+      float rho;
+      float phi;
+      float rhoDot;
+      iss >> rho;
+      iss >> phi;
+      iss >> rhoDot;
+      meas_package.raw_measurements_ << rho,phi,rhoDot;
+      iss >> timestamp;
+      meas_package.timestamp_ = timestamp;
+      measurement_pack_list.push_back(meas_package);
     }
     ++i;
   }

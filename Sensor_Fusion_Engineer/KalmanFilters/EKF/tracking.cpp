@@ -33,6 +33,11 @@ Tracking::Tracking() {
   kf_.H_ << 1, 0, 0, 0,
             0, 1, 0, 0;
 
+  kf_.Hj_ = MatrixXd(3,4);
+  kf_.Hj_ << 0, 0, 0, 0,
+             0, 0, 0, 0,
+             0, 0, 0, 0;
+
   // the initial transition matrix F_
   kf_.F_ = MatrixXd(4, 4);
   kf_.F_ << 1, 0, 1, 0,
@@ -91,7 +96,15 @@ void Tracking::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
   // 4. Call the Kalman Filter update() function
   //      with the most recent raw measurements_
-  kf_.Update(measurement_pack.raw_measurements_);
+  if (measurement_pack.sensor_type_ == MeasurementPackage::LASER)
+  {
+    kf_.Update(measurement_pack.raw_measurements_);
+  }
+  else // RADAR so use EKF
+  {
+    kf_.Hj_ = kf_.CalculateJacobian();
+    kf_.UpdateEKF(measurement_pack.raw_measurements_);
+  }
   
   cout << "x_= " << kf_.x_ << endl;
   cout << "P_= " << kf_.P_ << endl;

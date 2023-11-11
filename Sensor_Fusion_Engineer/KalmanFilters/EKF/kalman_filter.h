@@ -2,6 +2,8 @@
 #define KALMAN_FILTER_H_
 
 #include <eigen3/Eigen/Dense>
+#include <cmath>
+#include <iostream>
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -30,6 +32,12 @@ class KalmanFilter {
    * @param z The measurement at k+1
    */
   void Update(const VectorXd &z);
+
+  // New update for EKF
+  void UpdateEKF(const VectorXd &z);
+
+  // Calculate jacobian
+  MatrixXd CalculateJacobian();
   
   // state vector
   VectorXd x_;
@@ -45,6 +53,7 @@ class KalmanFilter {
 
   // measurement matrix
   MatrixXd H_;
+  MatrixXd Hj_;
 
   // measurement covariance matrix
   MatrixXd R_;
