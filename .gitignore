@@ -1,6 +1,5 @@
 
-Intro_To_Self_Driving_Car/BreadthFirstSearch/CPP/a.out
-Intro_To_Self_Driving_Car/ComputerVision/TrafficLightClassifier/__pycache__/
+*__pycache__/
 *.DS_Store
 *.vscode
 #*.code-workspace
@@ -71,3 +70,6 @@ Intro_To_Self_Driving_Car/ComputerVision/TrafficLightClassifier/__pycache__/
 # Ignore all local history of files
 .history
 .ionide
+
+# All build folders
+*build/
