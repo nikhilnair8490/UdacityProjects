@@ -53,10 +53,11 @@ class KalmanFilter {
 
   // measurement matrix
   MatrixXd H_;
-  MatrixXd Hj_;
+  MatrixXd Hj_; // Jacobian for RADAR
 
   // measurement covariance matrix
-  MatrixXd R_;
+  MatrixXd R_; // laser Covariance
+  MatrixXd Rr_; // Radar Covariance
 
 };
 

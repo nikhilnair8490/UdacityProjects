@@ -62,7 +62,7 @@ void KalmanFilter::UpdateEKF(const VectorXd &z)
   }
 
   MatrixXd Ht = Hj_.transpose();
-  MatrixXd S = Hj_ * P_ * Ht + R_;
+  MatrixXd S = Hj_ * P_ * Ht + Rr_;
   MatrixXd Si = S.inverse();
   MatrixXd PHt = P_ * Ht;
   MatrixXd K = PHt * Si;

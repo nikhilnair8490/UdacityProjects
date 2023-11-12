@@ -27,6 +27,10 @@ Tracking::Tracking() {
   kf_.R_ = MatrixXd(2, 2);
   kf_.R_ << 0.0225, 0,
             0, 0.0225;
+  kf_.Rr_ = MatrixXd(3, 3);
+  kf_.Rr_ << 0.0225, 0, 0,
+            0, 0.0225, 0,
+            0, 0, 0.0225;
 
   // measurement matrix
   kf_.H_ = MatrixXd(2, 4);

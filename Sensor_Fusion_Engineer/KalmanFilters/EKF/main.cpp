@@ -20,7 +20,7 @@ int main() {
   /**
    * Set Measurements
    */
-  cout<<"print";
+
   vector<MeasurementPackage> measurement_pack_list;
 
   // hardcoded input file with laser and radar measurements
@@ -35,7 +35,7 @@ int main() {
   string line;
   // set i to get only first 3 measurments
   int i = 0;
-  while (getline(in_file, line) && (i<=3)) {
+  while (getline(in_file, line) && (i<=10)) {
 
     MeasurementPackage meas_package;
 
