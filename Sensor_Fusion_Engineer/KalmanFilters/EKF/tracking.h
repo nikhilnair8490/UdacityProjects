@@ -6,6 +6,9 @@
 #include <fstream>
 #include "kalman_filter.h"
 #include "measurement_package.h"
+#include <vector>
+
+using std::vector;
 
 class Tracking {
  public:
@@ -13,6 +16,8 @@ class Tracking {
   virtual ~Tracking();
   void ProcessMeasurement(const MeasurementPackage &measurement_pack);
   KalmanFilter kf_;
+  VectorXd CalculateRMSE(const vector<VectorXd> &estimations,
+    const vector<VectorXd> &ground_truth);
 
  private:
   bool is_initialized_;

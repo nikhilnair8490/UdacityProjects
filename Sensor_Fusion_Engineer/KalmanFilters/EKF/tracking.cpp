@@ -113,3 +113,40 @@ void Tracking::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   cout << "x_= " << kf_.x_ << endl;
   cout << "P_= " << kf_.P_ << endl;
 }
+
+// Calculate performance of tracking
+//RMSE of state estimations
+VectorXd Tracking::CalculateRMSE(const vector<VectorXd> &estimations,
+    const vector<VectorXd> &ground_truth) {
+
+  VectorXd rmse(4);
+  rmse << 0,0,0,0;  
+
+  // check the validity of the following inputs:
+  //  * the estimation vector size should not be zero
+  if (estimations.empty())
+  {
+    return rmse;
+  }
+  //  * the estimation vector size should equal ground truth vector size
+  if (estimations.size() != ground_truth.size())
+  {
+    return rmse;
+  }
+
+  // Accumulate squared residuals
+  for (int i=0; i < estimations.size(); ++i) {
+    VectorXd resd = estimations[i] - ground_truth[i];
+    resd = resd.array().square();
+    rmse += resd;
+  }
+
+  // calculate the mean
+  rmse = rmse/estimations.size();
+
+  // calculate the squared root
+  rmse = rmse.array().sqrt();
+
+  // return the result
+  return rmse;
+}
