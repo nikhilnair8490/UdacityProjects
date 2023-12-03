@@ -4,8 +4,9 @@
 #include "Eigen/Dense"
 #include "measurement_package.h"
 
-class UKF {
- public:
+class UKF
+{
+public:
   /**
    * Constructor
    */
@@ -41,6 +42,29 @@ class UKF {
    */
   void UpdateRadar(MeasurementPackage meas_package);
 
+  /**
+   * @brief Generate augmented sigma points
+   *
+   * @param Xsig_aug Augmented Sigma Points
+   */
+  void AugmentedSigmaPoints(Eigen::MatrixXd &Xsig_aug);
+
+  /**
+   * @brief Predict sigma points
+   *
+   * @param Xsig_aug  Augmented sigma points
+   * @param Xsig_pred Predicted sigma points
+   * @param delta_t   Time between sensor measurements
+   */
+  void SigmaPointPrediction(const Eigen::MatrixXd &Xsig_aug, Eigen::MatrixXd &Xsig_pred,
+                            double delta_t);
+
+  /**
+   * @brief Predict state mean and process covariance
+   *
+   * @param Xsig_pred Predicted sigma points
+   */
+  void PredictMeanAndCovariance(const Eigen::MatrixXd &Xsig_pred);
 
   // initially set to false, set to true in first call of ProcessMeasurement
   bool is_initialized_;
@@ -82,7 +106,7 @@ class UKF {
   double std_radphi_;
 
   // Radar measurement noise standard deviation radius change in m/s
-  double std_radrd_ ;
+  double std_radrd_;
 
   // Weights of sigma points
   Eigen::VectorXd weights_;
@@ -97,4 +121,4 @@ class UKF {
   double lambda_;
 };
 
-#endif  // UKF_H
+#endif // UKF_H
