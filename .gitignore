@@ -1,7 +1,7 @@
 
 *__pycache__/
 *.DS_Store
-*.vscode
+#*.vscode
 #*.code-workspace
 ### C++ ###
 # Prerequisites
