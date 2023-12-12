@@ -66,6 +66,14 @@ public:
    */
   void PredictMeanAndCovariance(const Eigen::MatrixXd &Xsig_pred);
 
+  /**
+   * @brief Predict radar states in measurement space
+   * 
+   * @param z_out Radar state vector in measurement space
+   * @param S_out Radar measurement covariance matrix
+   */
+  void PredictRadarMeasurement(Eigen::VectorXd &z_pred, Eigen::MatrixXd &S, Eigen::MatrixXd &Zsig);
+
   // initially set to false, set to true in first call of ProcessMeasurement
   bool is_initialized_;
 
@@ -119,6 +127,19 @@ public:
 
   // Sigma point spreading parameter
   double lambda_;
+
+  // set measurement dimension, radar can measure r, phi, and r_dot
+  int n_z_radar_;
+
+  //Lidar can measure px, py;
+  int n_z_lidar_;
+
+  // NIS value for radar
+  float nisRadar_ = 0.0;
+
+  // NIS value for lidar
+  float nisLidar_ = 0.0;
+
 };
 
 #endif // UKF_H
