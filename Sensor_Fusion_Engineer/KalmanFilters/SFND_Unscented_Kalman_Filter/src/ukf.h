@@ -56,7 +56,7 @@ public:
    * @param Xsig_pred Predicted sigma points
    * @param delta_t   Time between sensor measurements
    */
-  void SigmaPointPrediction(const Eigen::MatrixXd &Xsig_aug, Eigen::MatrixXd &Xsig_pred,
+  void SigmaPointPrediction(const Eigen::MatrixXd &Xsig_aug, Eigen::MatrixXd &Xsig_pred_,
                             double delta_t);
 
   /**
@@ -64,7 +64,7 @@ public:
    *
    * @param Xsig_pred Predicted sigma points
    */
-  void PredictMeanAndCovariance(const Eigen::MatrixXd &Xsig_pred);
+  void PredictMeanAndCovariance(const Eigen::MatrixXd &Xsig_pred_);
 
   /**
    * @brief Predict radar states in measurement space
