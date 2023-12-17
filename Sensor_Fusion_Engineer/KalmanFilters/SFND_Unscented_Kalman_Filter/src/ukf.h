@@ -69,8 +69,9 @@ public:
   /**
    * @brief Predict radar states in measurement space
    * 
-   * @param z_out Radar state vector in measurement space
-   * @param S_out Radar measurement covariance matrix
+   * @param z_pred  Radar predicted state vector in measurement space
+   * @param S       Radar measurement covariance matrix
+   * @param Zsig    Radar sigma points matrix in measurement space
    */
   void PredictRadarMeasurement(Eigen::VectorXd &z_pred, Eigen::MatrixXd &S, Eigen::MatrixXd &Zsig);
 
