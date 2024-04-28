@@ -1,0 +1,7 @@
+source /data/virtual_envs/sdc-c1-gpu-augment/bin/activate
+
+PYTHONPATH=/data/virtual_envs/sdc-c1-gpu-augment/lib/python3.7/site-packages:$PYTHONPATH
+
+LD_LIBRARY_PATH=/opt/miniconda3/envs/sdc-c1-cuda/lib:$LD_LIBRARY_PATH
+
+ln -s /data/waymo/training_segment-1005081002024129653_5313_150_5333_150_with_camera_labels.tfrecord /home/workspace/training_segment-1005081002024129653_5313_150_5333_150_with_camera_labels.tfrecord
