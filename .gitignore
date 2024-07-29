@@ -73,3 +73,4 @@
 
 # All build folders
 *build/
+*Zone.Identifier
