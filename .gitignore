@@ -74,3 +74,11 @@
 # All build folders
 *build/
 *Zone.Identifier
+
+# Python Virtual Envs
+venv_tensor_flow/
+venv_sensor_fusion/
+
+#data
+dataset/
+
