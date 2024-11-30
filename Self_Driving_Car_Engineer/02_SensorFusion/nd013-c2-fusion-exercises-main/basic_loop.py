@@ -48,10 +48,10 @@ sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, EXE_L2)))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, EXA_L2)))
 
 # import functions from individual exercise files
-import l2_examples
-import l2_exercises
 import l1_examples
+import l2_examples
 import l1_exercises
+# import l2_exercises
 
 
 ##################
@@ -103,7 +103,8 @@ while True:
         lidar_name = dataset_pb2.LaserName.TOP
 
         # Exercise C1-3-1 : print no. of vehicles
-        # l1_exercises.print_no_of_vehicles(frame) 
+        # l1_exercises.print_no_of_vehicles(frame)
+        # l1_exercises.print_leds_lidar(frame, lidar_name)
 
         # Example C1-3-2 : display camera image
         # l1_examples.display_image(frame)
@@ -112,13 +113,13 @@ while True:
         # l1_examples.print_vfov_lidar(frame, lidar_name)
 
         # Example C1-5-1 : Load range image
-        # l1_examples.print_range_image_shape(frame, lidar_name)
+        #l1_examples.print_range_image_shape(frame, lidar_name)
 
         # Exercise C1-5-2 : Compute pitch angle resolution
-        # l1_exercises.print_pitch_resolution(frame, lidar_name)
+        #l1_exercises.print_pitch_resolution(frame, lidar_name)
 
         # Example C1-5-3 : Retrieve maximum and minimum distance
-        # l1_examples.get_max_min_range(frame, lidar_name)
+        #l1_examples.get_max_min_range(frame, lidar_name)
 
         # Example C1-5-4 : Visualize range channel
         # l1_examples.vis_range_channel(frame, lidar_name)
@@ -127,7 +128,7 @@ while True:
         # l1_exercises.vis_intensity_channel(frame, lidar_name)
 
         # Example C1-5-6 : Convert range image to 3D point-cloud
-        # l1_examples.range_image_to_point_cloud(frame, lidar_name)
+        l1_examples.range_image_to_point_cloud(frame, lidar_name)
 
         #######
         ####### LESSON 1 EXERCISES & EXAMPLES  END #######

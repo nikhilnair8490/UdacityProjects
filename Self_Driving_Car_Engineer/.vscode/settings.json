@@ -1,0 +1,8 @@
+{
+    "python.analysis.extraPaths": [
+        "./02_SensorFusion/nd013-c2-fusion-exercises-main/lesson-1-lidar-sensor/examples",
+        "./02_SensorFusion/nd013-c2-fusion-exercises-main/lesson-2-object-detection/examples",
+        "./02_SensorFusion/nd013-c2-fusion-exercises-main/lesson-2-object-detection/exercises/starter",
+        "./02_SensorFusion/nd013-c2-fusion-exercises-main/lesson-1-lidar-sensor/exercises/starter"
+    ]
+}
